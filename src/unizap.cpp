@@ -37,11 +37,19 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 	if (include_dir) {
 		std::string b_dir_name;
 		b_dir_name = base_path;
+#ifdef __linux__
+		b_dir_name.erase(0, b_dir_name.rfind("/") + 1);
+
+		zip.add_dir_to_zip(b_dir_name);
+
+		base_path.erase(base_path.rfind("/"), base_path.length());
+#else
 		b_dir_name.erase(0, b_dir_name.rfind("\\") + 1);
 
 		zip.add_dir_to_zip(b_dir_name);
 
 		base_path.erase(base_path.rfind("\\"), base_path.length());
+#endif
 	}
 
 	std::vector<std::filesystem::path> _p;
@@ -79,7 +87,11 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 		std::string _d = _p[a].string();
 		std::string buff = _d;
 		_d.erase(0, base_path.length() + 1);
+#ifdef __linux__
+		_d.erase(_d.rfind("/"), _d.length());
+#else 
 		_d.erase(_d.rfind("\\"), _d.length());
+#endif 
 		zip.add_file_to_zip(buff, _d);
 	}
 	Sleep(500);
@@ -170,7 +182,7 @@ void download() {
 }
 
 int main() {	
-	if (std::filesystem::exists("config.owl")) {
+	if (!std::filesystem::exists("config.owl")) {
 		error_handler::call_error_and_exit("[COMPILER_ERROR]Could not find a config file");
 	}
 	_parser.parse_config();
@@ -189,7 +201,7 @@ int main() {
 		else {
 			printf("Download successful!\n");
 			printf("{\n");
-			std::string s = std::filesystem::absolute(_parser.get_output_path()).string() + "\\" + _parser.get_file_name();
+			std::string s = std::filesystem::absolute(_parser.get_output_path()).string() + "/" + _parser.get_file_name();
 			printf("OUTPUT: %s\n", s.c_str());
 			format_file_size f(s);
 			printf("SIZE: %s\n", f.formatted_size().c_str());

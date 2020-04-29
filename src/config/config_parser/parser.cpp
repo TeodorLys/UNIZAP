@@ -11,9 +11,9 @@
 Another function needing a overhaul. EXTREME JANQ!
 */
 void parser::parse_config() {
-	std::fstream file(std::filesystem::current_path().string() + "\\Release\\config.owl", std::fstream::in);
+	std::fstream file(std::filesystem::current_path().string() + "/config.owl", std::fstream::in);
 	if (!file.is_open()) {
-		error_handler::call_error_and_exit("[COMPILER_ERROR] Could not open config file");
+		error_handler::call_error_and_exit("[COMPILER_ERROR] Could not open confg file, " + std::filesystem::current_path().string() + "/config.owl");
 	}
 
 	for (std::string s; getline(file, s);) {

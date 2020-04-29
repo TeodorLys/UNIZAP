@@ -71,7 +71,7 @@ bool network_handler::download_from_dropbox(std::filesystem::path path, std::str
 	std::string out;
 	std::string args = "Dropbox-API-Arg: {\"path\":\"/";  // Dropbox:es api, default stuff...
 	if (output.find(path.filename().string()) == std::string::npos)
-		output += "\\" + path.filename().string();
+		output += "/" + path.filename().string();
 	/*
 	If the request was NOT successful, I still want the program to continue.
 	Butt? if it WAS successful, cleanup and create the file.
