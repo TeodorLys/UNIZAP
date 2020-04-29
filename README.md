@@ -1,3 +1,7 @@
+<p align="center">
+<img src="doc/UNIZAP_LOGO_UGLY.png" align="center" width="350" height="125"/> 
+ </p>
+
 # UNIZAP
 This program will zip up a directory or list of files and push it to Dropbox.
 It uses a config file, where you can specify what files to include or what directory to include.
