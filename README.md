@@ -1,5 +1,5 @@
 <p align="center">
-<img src="doc/UNIZAP_LOGO_UGLY.png" align="center" width="350" height="125"/> 
+<img src="doc/UNIZAP_LOGO_UGLY_.png" align="center" width="350" height="125"/> 
  </p>
 
 # UNIZAP
