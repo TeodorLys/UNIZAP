@@ -2,8 +2,8 @@
 #include <fstream>
 #include <string>
 #include "string_conversions.h"
-#include "error_handler.h"
-#include "rand_name.h"
+#include "../../user_communication/error_handler.h"
+#include "../../file_handling/rand_name.h"
 #include <filesystem>
 #include <iostream>
 

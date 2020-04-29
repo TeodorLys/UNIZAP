@@ -1,5 +1,5 @@
 #include "zip_handler.h"
-#include "error_handler.h"
+#include "../user_communication/error_handler.h"
 void zip_handler::create_zip(std::filesystem::path path) {
 	z = zip_open(path.string().c_str(), ZIP_CREATE, &error);
 	if (error)

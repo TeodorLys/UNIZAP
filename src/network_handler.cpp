@@ -1,7 +1,7 @@
 #include "network_handler.h"
 #include <string>
 #include <fstream>
-#include "error_handler.h"
+#include "user_communication/error_handler.h"
 
 size_t write_data(void* ptr, size_t size, size_t nmemb, void* stream) {
 	((std::string*) stream)->append((const char*)ptr, (size_t)size * nmemb);
@@ -106,6 +106,16 @@ bool network_handler::download_from_dropbox(std::filesystem::path path, std::str
 	if (success) {
 		curl_easy_cleanup(curl);
 		curl_global_cleanup();
+		if (out.find("error_summary") != std::string::npos) {
+			for (char c : out) {
+				if (c == '}')
+					printf("\n");
+				printf("%c", c);
+				if (c == ',' || c == '{')
+					printf("\n");
+			}
+			error_handler::call_error_and_exit("\n[DROPBOX_ERROR] Could not find file");
+		}
 		std::fstream f;
 		f.open(output, std::fstream::binary | std::fstream::out);
 		f << out;

@@ -2,13 +2,13 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
-#include "parser.h"
-#include "error_handler.h"
-#include "zip_handler.h"
+#include "config/config_parser/parser.h"
+#include "user_communication/error_handler.h"
+#include "file_handling/zip_handler.h"
 #include "network_handler.h"
-#include "progress.h"
-#include "rand_name.h"
-#include "format_file_size.h"
+#include "visual_goodness/progress.h"
+#include "file_handling/rand_name.h"
+#include "file_handling/format_file_size.h"
 
 struct file_data {
 	std::string name;
@@ -191,7 +191,7 @@ int main() {
 			printf("{\n");
 			std::string s = std::filesystem::absolute(_parser.get_output_path()).string() + "\\" + _parser.get_file_name();
 			printf("OUTPUT: %s\n", s.c_str());
-			format_file_size f(std::filesystem::absolute(_parser.get_output_path()).string());
+			format_file_size f(s);
 			printf("SIZE: %s\n", f.formatted_size().c_str());
 			printf("}\n");
 		}
