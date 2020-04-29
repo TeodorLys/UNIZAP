@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <iostream>
 #include <thread>
+#include <algorithm>
 #include "config/config_parser/parser.h"
 #include "user_communication/error_handler.h"
 #include "file_handling/zip_handler.h"
@@ -32,7 +33,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 	std::string base_path = std::filesystem::absolute(path).string();
 	printf("Done\n");
 
-	Sleep(500);
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 	if (include_dir) {
 		std::string b_dir_name;
@@ -77,7 +78,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 			_p.erase(_p.begin() + a);
 		}
 	}
-	Sleep(500);
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	/*
 	Atlast we add the files, we need to parse the directory, to put the files into the 
 	correct folder(in the zip file)
@@ -94,7 +95,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 #endif 
 		zip.add_file_to_zip(buff, _d);
 	}
-	Sleep(500);
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	if (add_scoped_files) {
 		for (int a = 0; a < (int)files.size(); a++) {
 			zip.add_file_to_zip(files[a]);
@@ -102,7 +103,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 			__p.one_forward();
 		}
 	}
-	Sleep(500);
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	__p.one_forward();
 	printf(" Done\n");
 
@@ -125,7 +126,7 @@ void upload() {
 			error_handler::call_error_and_exit("[RUNTIME_ERROR] Directory path did not exists " + _parser.get_dir_path());
 		}
 
-		Sleep(100);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 		zip_up_directory(_parser.get_dir_path(), _parser.get_file_name(), _parser.include_directory(), (files.size() > 0));
 	}
