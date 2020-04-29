@@ -29,7 +29,7 @@ bool zip_handler::delete_zip() {
 	try {
 		std::filesystem::remove(zip_path);
 	}
-	catch (std::filesystem::filesystem_error& e) {
+	catch (std::filesystem::filesystem_error e) {
 		return false;
 	}
 	return true;

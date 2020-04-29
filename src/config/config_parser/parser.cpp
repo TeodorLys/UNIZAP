@@ -13,7 +13,7 @@ Another function needing a overhaul. EXTREME JANQ!
 void parser::parse_config() {
 	std::fstream file(std::filesystem::current_path().string() + "\\Release\\config.owl", std::fstream::in);
 	if (!file.is_open()) {
-		error_handler::call_error_and_exit("Could not open config file");
+		error_handler::call_error_and_exit("[COMPILER_ERROR] Could not open config file");
 	}
 
 	for (std::string s; getline(file, s);) {
@@ -33,28 +33,28 @@ void parser::parse_config() {
 				if(lexer_data[a + 2].type == tokens::string_literal)
 					access = lexer_data[a + 2].value;
 				else 
-					error_handler::call_error_and_exit("Could not parse the access token");
+					error_handler::call_error_and_exit("[COMPILER_ERROR] Could not parse the access token");
 			}
 			else if (lexer_data[a].value == "DIR_PATH") {
 				if (lexer_data[a + 2].type == tokens::string_literal)
 					dir_path = lexer_data[a + 2].value;
 				else
-					error_handler::call_error_and_exit("Could not parse the dir_path predef");
+					error_handler::call_error_and_exit("[COMPILER_ERROR] Could not parse the dir_path predef");
 			}
-			else if (lexer_data[a].value == "ZIP_NAME") {
+			else if (lexer_data[a].value == "FILE_NAME") {
 				if (lexer_data[a + 2].type == tokens::string_literal) {
-					zip_name = lexer_data[a + 2].value;
-					if (zip_name.find(".zip") == std::string::npos)
-						zip_name += ".zip";
+					file_name = lexer_data[a + 2].value;
+					if (file_name.find(".zip") == std::string::npos)
+						file_name += ".zip";
 				}
-				else if (lexer_data[a].value == "UPLOAD_PATH") {
+				else if (lexer_data[a].value == "OUTPUT_PATH") {
 					if (lexer_data[a + 2].type == tokens::string_literal)
-						upload_path = lexer_data[a + 2].value;
+						output_path = lexer_data[a + 2].value;
 					else
-						error_handler::call_error_and_exit("Could not parse the dir_path predef");
+						error_handler::call_error_and_exit("[COMPILER_ERROR] Could not parse the dir_path predef");
 				}
 				else
-					error_handler::call_error_and_exit("Could not parse the dir_path predef");
+					error_handler::call_error_and_exit("[COMPILER_ERROR] Could not parse the dir_path predef");
 			}
 		}/**/
 		/*
@@ -68,9 +68,7 @@ void parser::parse_config() {
 					syntax_check = true;
 
 			if (!syntax_check) {
-				printf("[COMPILE_ERROR]Expected a } at %s\n", lexer_data[b].value.c_str());
-				std::cin.get();
-				exit(0);
+				error_handler::call_error_and_exit("[COMPILE_ERROR]Expected a } at " + lexer_data[b].value);
 			}
 			if (lexer_data[a].value == "FLAGS") {
 				b = a + 2;
@@ -83,6 +81,12 @@ void parser::parse_config() {
 						}
 						else if (lexer_data[b].value == "DISABLE_CONFIRM_CURL") {
 							_confirm_curl = false;
+						}
+						else if (lexer_data[b].value == "DOWNLOAD") {
+							_download = true;
+						}
+						else if (lexer_data[b].value == "UPLOAD") {
+							_upload = true;
 						}
 					}
 					b++;
@@ -103,21 +107,28 @@ void parser::parse_config() {
 	/*
 	If no zip name were given, we just create a random generated one.
 	*/
-	if (zip_name == ""){
+	if (file_name == "" && _upload){
 		rand_name r(10);
 		std::string t = r.get_name() + ".zip";
-		zip_name = std::filesystem::absolute(t).string();
+		file_name = std::filesystem::absolute(t).string();
 		/*
 		And if no upload path was given we just use the name, and put it in the most forward folder in dropbox
 		*/
-		if (upload_path == "") {
-			std::filesystem::path p(zip_name);
-			upload_path = p.filename().string();
+		if (output_path == "") {
+			std::filesystem::path p(file_name);
+			output_path = p.filename().string();
 		}
+	}
+	
+	if (output_path == "" && _download) {
+		output_path = std::filesystem::current_path().string();
 	}
 
 	if(access == "")
-		error_handler::call_error_and_exit("Access token was NULL!");
+		error_handler::call_error_and_exit("[RUNTIME_ERROR] Access token was NULL!");
+
+	if (!_upload && !_download)
+		error_handler::call_error_and_exit("[RUNTIME_ERROR] Action was unspecified, DOWNLOAD or UPLOAD (in FLAGS)");
 
 }
 

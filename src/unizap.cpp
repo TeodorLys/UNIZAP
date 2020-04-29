@@ -19,7 +19,7 @@ struct file_data {
 
 std::vector<std::string> files;
 std::vector<file_data> all_files;
-
+parser _parser;
 /*
 This function needs to be looked at!
 This is probably the janqiest function I have ever made...
@@ -97,15 +97,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 	zip.close_zip();
 }
 
-
-
-int main() {	
-
-	if (std::filesystem::exists("config.owl")) {
-		error_handler::call_error_and_exit("Could not find a config file");
-	}
-	parser _parser;
-	_parser.parse_config();
+void upload() {
 	files = _parser.get_files_content();
 	for (int a = 0; a < (int)files.size(); a++) {
 		if (!std::filesystem::exists(files[a])) {
@@ -123,11 +115,12 @@ int main() {
 
 		Sleep(100);
 
-		zip_up_directory(_parser.get_dir_path(), _parser.get_zip_name(), _parser.include_directory(), (files.size() > 0));
+		zip_up_directory(_parser.get_dir_path(), _parser.get_file_name(), _parser.include_directory(), (files.size() > 0));
 	}
+
 	/*
-	Prints all information about the upload, and prompts the user to confirm if all looks OKAY.
-	*/
+Prints all information about the upload, and prompts the user to confirm if all looks OKAY.
+*/
 	if (_parser.confirm_curl()) {
 		printf("\\===FILES====/\n");
 		for (int a = 0; a < (int)all_files.size(); a++) {
@@ -136,9 +129,9 @@ int main() {
 		}
 		printf("\\===FILES====/\n");
 
-		format_file_size f(std::filesystem::absolute(_parser.get_zip_name()));
-		printf("OUTPUT PATH: %s, size: %s\n", std::filesystem::absolute(_parser.get_zip_name()).string().c_str(), f.formatted_size().c_str());
-		printf("UPLOAD PATH: %s\n", _parser.get_upload_path().c_str());
+		format_file_size f(std::filesystem::absolute(_parser.get_file_name()));
+		printf("OUTPUT PATH: %s, size: %s\n", std::filesystem::absolute(_parser.get_file_name()).string().c_str(), f.formatted_size().c_str());
+		printf("UPLOAD PATH: %s\n", _parser.get_output_path().c_str());
 
 		printf("Does this look good? (Y/N) > ");
 		std::string answer;
@@ -147,15 +140,61 @@ int main() {
 		std::transform(answer.begin(), answer.end(), answer.begin(), ::tolower);
 
 		if (answer != "y") {
-			printf("OOOK, no then... good bye \n");
+			printf("OOOK, no then... good bye\n");
+			std::filesystem::remove(std::filesystem::absolute(_parser.get_file_name()));
 			exit(0);
 		}
 	}
 
-	network_handler net;
+}
 
-	if (!net.upload_to_dropbox(std::filesystem::absolute(_parser.get_zip_name()), _parser.get_access_token())) {
-		error_handler::call_error_and_exit("Could not send the request to dropbox, check network connection!");
+void download() {
+	if (_parser.get_file_name() == "") {
+		error_handler::call_error_and_exit("[RUNTIME_ERROR] No file name given (ZIP_NAME)");
+	}
+
+	if (_parser.confirm_curl()) {
+		printf("OUTPUT PATH: %s\n", std::filesystem::absolute(_parser.get_output_path()).string().c_str());
+
+		printf("Does this look good? (Y/N) > ");
+		std::string answer;
+		std::getline(std::cin, answer);
+
+		std::transform(answer.begin(), answer.end(), answer.begin(), ::tolower);
+
+		if (answer != "y") {
+			printf("OOOK, no then... good bye\n");
+			exit(0);
+		}
+	}
+}
+
+int main() {	
+	if (std::filesystem::exists("config.owl")) {
+		error_handler::call_error_and_exit("[COMPILER_ERROR]Could not find a config file");
+	}
+	_parser.parse_config();
+	network_handler net;
+	if (_parser.upload()) {
+		upload();
+
+		if (!net.upload_to_dropbox(std::filesystem::absolute(_parser.get_file_name()), _parser.get_access_token())) {
+			error_handler::call_error_and_exit("[RUNTIME_ERROR] Could not send the request to dropbox, check network connection and access token!");
+		}
+	}
+	else if (_parser.download()) {
+		download();
+		if (!net.download_from_dropbox(_parser.get_file_name(), std::filesystem::absolute(_parser.get_output_path()).string(), _parser.get_access_token()))
+			error_handler::call_error_and_exit("[RUNTIME_ERROR] Could not send the request to dropbox, check network connection!");
+		else {
+			printf("Download successful!\n");
+			printf("{\n");
+			std::string s = std::filesystem::absolute(_parser.get_output_path()).string() + "\\" + _parser.get_file_name();
+			printf("OUTPUT: %s\n", s.c_str());
+			format_file_size f(std::filesystem::absolute(_parser.get_output_path()).string());
+			printf("SIZE: %s\n", f.formatted_size().c_str());
+			printf("}\n");
+		}
 	}
 
 	std::cin.get();

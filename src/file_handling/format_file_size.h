@@ -25,12 +25,12 @@ public:
 		if (!std::filesystem::exists(path))
 			error_handler::call_error_and_exit("[FORMAT_FILE_SIZE] Path does not exists...");
 		file_size = std::filesystem::file_size(path);
-		kilo = file_size / 1000;
-		mega = file_size / 1000000;
-		giga = file_size / 1000000000;
+		kilo = (long)(file_size / 1000);
+		mega = (long)(file_size / 1000000);
+		giga = (long)(file_size / 1000000000);
 		//These two probably wont be used that much
-		tera = file_size / 1000000000000;
-		peta = file_size / 1000000000000000;
+		tera = (long)(file_size / 1000000000000);
+		peta = (long)(file_size / 1000000000000000);
 	}
 	/*
 	Returns the size in given format, see enum above

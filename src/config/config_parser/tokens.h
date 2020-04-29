@@ -123,7 +123,7 @@ struct separators {
 };
 
 struct predefined_literals {
-	static const int size_of_array = 3;
+	static const int size_of_array = 5;
 	static const std::string s_predefined_literals[size_of_array];
 
 	static bool check_type(const std::string s) {
