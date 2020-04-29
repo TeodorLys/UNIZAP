@@ -1,5 +1,5 @@
 <p align="center">
-<img src="doc/UNIZAP_LOGO_UGLY.png" align="center" width="350" height="125"/> 
+<img src="doc/UNIZAP_LOGO_UGLY_.png" align="center" width="350" height="125"/> 
  </p>
 
 # UNIZAP
@@ -12,9 +12,10 @@ The config file extension is .owl, which is a scripting language I tried to make
 
 
 ## Config file 
+### UPLOAD
 ```Java
 ACCESS = "<ACCESS TOKEN>"
-ZIP_NAME = "unizap.zip"  // Can also include full path
+FILE_NAME = "unizap.zip"  // Can also include full path
 DIR_PATH = "..\unizap"   // If you want to zip up a full directory
 OUTPUT_PATH = "Versions" // Where to send the zip file, in dropbox
 
@@ -27,6 +28,22 @@ FLAGS {
                        // parent directory i.e. "unizap\file.txt" in zip file
   DISABLE_CONFIRM_CURL // The program will, by default, give the user file info 
                        // and output path etc. and give a confirm if all is ok, and then upload
+  UPLOAD
+}
+
+ ```
+### DOWNLOAD
+```Java
+ACCESS = "<ACCESS TOKEN>"
+FILE_NAME = "unizap.zip" // Can also include full path
+OUTPUT_PATH = "Versions" // Where to send the zip file, in dropbox, 
+                         //if null, current path will be used
+FLAGS {
+  INCLUDE_DIRECTORY    // In the DIR_PATH, if you want to include the 
+                       // parent directory i.e. "unizap\file.txt" in zip file
+  DISABLE_CONFIRM_CURL // The program will, by default, give the user file info 
+                       // and output path etc. and give a confirm if all is ok, and then upload
+  DOWNLOAD
 }
 
  ```
