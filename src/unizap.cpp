@@ -21,18 +21,34 @@ struct file_data {
 std::vector<std::string> files;
 std::vector<file_data> all_files;
 parser _parser;
+zip_handler zip;
+
+
+
+void zip_single_files() {
+	for (int a = 0; a < (int)files.size(); a++) {
+		zip.add_file_to_zip(files[a]);
+		all_files.push_back(file_data(files[a], files[a]));
+	}
+}
+
+
+void zip_prepare(std::string zip_name) {
+	printf("Creating zip file...");
+	zip.create_zip(zip_name);
+	printf("Done\n");
+}
+
 /*
 This function needs to be looked at!
 This is probably the janqiest function I have ever made...
 TODO: Add some error checks, try{ etc...
 */
 void zip_up_directory(std::string path, std::string zip_name, bool include_dir, bool add_scoped_files) {
-	printf("Creating zip file...");
-	zip_handler zip;
-	zip.create_zip(zip_name);
-	std::string base_path = std::filesystem::absolute(path).string();
-	printf("Done\n");
 
+	zip_prepare(zip_name);
+
+	std::string base_path = std::filesystem::absolute(path).string();
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
 	if (include_dir) {
@@ -71,7 +87,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 		std::string buffer = _d;
 		_d.erase(0, base_path.length() + 1);
 		all_files.push_back(file_data(_d, buffer));
-		if (std::filesystem::is_directory(_d)) {
+		if (std::filesystem::is_directory(buffer)) {
 			//_d.erase(0, base_path.length() + 1);
 			__p.one_forward();
 			zip.add_dir_to_zip(_d);
@@ -97,11 +113,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	if (add_scoped_files) {
-		for (int a = 0; a < (int)files.size(); a++) {
-			zip.add_file_to_zip(files[a]);
-			all_files.push_back(file_data(files[a], files[a]));
-			__p.one_forward();
-		}
+		zip_single_files();
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	__p.one_forward();
@@ -109,6 +121,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 
 	zip.close_zip();
 }
+
 
 void upload() {
 	files = _parser.get_files_content();
@@ -127,13 +140,17 @@ void upload() {
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
 		zip_up_directory(_parser.get_dir_path(), _parser.get_file_name(), _parser.include_directory(), (files.size() > 0));
+	}
+	else {
+		zip_prepare(_parser.get_file_name());
+		zip_single_files();
+		zip.close_zip();
 	}
 
 	/*
-Prints all information about the upload, and prompts the user to confirm if all looks OKAY.
-*/
+	Prints all information about the upload, and prompts the user to confirm if all looks OKAY.
+	*/
 	if (_parser.confirm_curl()) {
 		printf("\\===FILES====/\n");
 		for (int a = 0; a < (int)all_files.size(); a++) {

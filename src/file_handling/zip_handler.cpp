@@ -6,15 +6,22 @@ void zip_handler::create_zip(std::filesystem::path path) {
 		error_handler::call_error_and_exit(zip_strerror(z));
 }
 
-void zip_handler::add_file_to_zip(std::filesystem::path path, std::string dir,bool print_name) {
+void zip_handler::add_file_to_zip(std::filesystem::path path, std::string dir, bool print_name) {
 	zs = zip_source_file(z, path.string().c_str(), 0, 0);
+
+	if (zs == NULL)
+		error_handler::call_error_and_exit("[ZIP_ERROR] Could not enumerate file, zip_source_file");
 
 	if (dir != "") {
 		dir += "/" + path.filename().string();
-		zip_file_add(z, dir.c_str(), zs, ZIP_FL_OVERWRITE);
+		int e = zip_file_add(z, dir.c_str(), zs, ZIP_FL_OVERWRITE);
+		if (e < 0)
+			error_handler::call_error_and_exit("[ZIP_ERROR] Could not add file");
 	}
 	else {
-		zip_file_add(z, path.filename().string().c_str(), zs, ZIP_FL_OVERWRITE);
+		int e = zip_file_add(z, path.filename().string().c_str(), zs, ZIP_FL_OVERWRITE);
+		if (e < 0)
+			error_handler::call_error_and_exit("[ZIP_ERROR] Could not add file");
 	}
 	
 	if (print_name)
@@ -22,7 +29,9 @@ void zip_handler::add_file_to_zip(std::filesystem::path path, std::string dir,bo
 }
 
 void zip_handler::add_dir_to_zip(std::string name) {
-	zip_dir_add(z, name.c_str(), ZIP_FL_ENC_UTF_8);
+	int e = zip_dir_add(z, name.c_str(), ZIP_FL_ENC_UTF_8);
+	if (e < 0)
+		error_handler::call_error_and_exit("[ZIP_ERROR] Could not add directory");
 }
 
 bool zip_handler::delete_zip() {
