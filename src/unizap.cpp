@@ -233,5 +233,7 @@ int main() {
 		}
 	}
 	
-	std::cin.get();
+	if (_parser.confirm_curl()) {
+		std::cin.get();
+	}
 }
