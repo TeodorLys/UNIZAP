@@ -47,14 +47,12 @@ void parser::parse_config() {
 					if (file_name.find(".zip") == std::string::npos)
 						file_name += ".zip";
 				}
-				else if (lexer_data[a].value == "OUTPUT_PATH") {
-					if (lexer_data[a + 2].type == tokens::string_literal)
-						output_path = lexer_data[a + 2].value;
-					else
-						error_handler::call_error_and_exit("[COMPILER_ERROR] Could not parse the dir_path predef");
-				}
+			}
+			else if (lexer_data[a].value == "OUTPUT_PATH") {
+				if (lexer_data[a + 2].type == tokens::string_literal)
+					output_path = lexer_data[a + 2].value;
 				else
-					error_handler::call_error_and_exit("[COMPILER_ERROR] Could not parse the dir_path predef");
+					error_handler::call_error_and_exit("[COMPILER_ERROR] Could not parse the output_path predef");
 			}
 		}/**/
 		/*
@@ -122,6 +120,10 @@ void parser::parse_config() {
 	
 	if (output_path == "" && _download) {
 		output_path = std::filesystem::current_path().string();
+	}
+	else if(output_path != ""){
+		if (!std::filesystem::exists(output_path))
+			error_handler::call_error_and_exit("[PARSER_ERROR] OUTPUT_PATH does not exists!");
 	}
 
 	if(access == "")

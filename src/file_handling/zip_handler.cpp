@@ -58,12 +58,12 @@ void zip_handler::add_file_to_zip(std::filesystem::path path, std::string dir, b
 
 	if (dir != "") {
 		dir += "/" + path.filename().string();
-		int e = zip_file_add(z, dir.c_str(), zs, ZIP_FL_OVERWRITE);
+		int e = (int)zip_file_add(z, dir.c_str(), zs, ZIP_FL_OVERWRITE);
 		if (e < 0)
 			error_handler::call_error_and_exit("[ZIP_ERROR] Could not add file, " + std::string(zip_strerror(z)));
 	}
 	else {
-		int e = zip_file_add(z, path.filename().string().c_str(), zs, ZIP_FL_OVERWRITE);
+		int e = (int)zip_file_add(z, path.filename().string().c_str(), zs, ZIP_FL_OVERWRITE);
 		if (e < 0)
 			error_handler::call_error_and_exit("[ZIP_ERROR] Could not add file, " + std::string(zip_strerror(z)));
 	}
@@ -73,7 +73,7 @@ void zip_handler::add_file_to_zip(std::filesystem::path path, std::string dir, b
 }
 
 void zip_handler::add_dir_to_zip(std::string name) {
-	int e = zip_dir_add(z, name.c_str(), ZIP_FL_ENC_UTF_8);
+	int e = (int)zip_dir_add(z, name.c_str(), ZIP_FL_ENC_UTF_8);
 	if (e < 0)
 		error_handler::call_error_and_exit("[ZIP_ERROR] Could not add directory, " + std::string(zip_strerror(z)));
 }
