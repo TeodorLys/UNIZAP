@@ -37,7 +37,7 @@ bool network_handler::upload_to_dropbox(std::filesystem::path path, std::string 
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &out);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, content.size());
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, content);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, content.c_str());
 
 		res = curl_easy_perform(curl);
 

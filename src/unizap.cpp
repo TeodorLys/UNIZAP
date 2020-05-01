@@ -224,6 +224,10 @@ int main() {
 			format_file_size f(s);
 			printf("SIZE: %s\n", f.formatted_size().c_str());
 			printf("}\n");
+			zip.open_zip(s);
+			printf("unzipping...");
+			zip.unzip(std::filesystem::absolute(_parser.get_output_path()).string());
+			printf("Done\n");
 		}
 	}
 
