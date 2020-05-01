@@ -6,6 +6,7 @@ class parser {
 	lexical_analyzer lexer;
 	std::vector<tokenizer_data> lexer_data;
 	std::vector<std::string> files;
+	std::vector<std::string> skip;
 	std::string access;
 	std::string dir_path;
 	std::string file_name;
@@ -37,6 +38,7 @@ public:
 	bool upload() const { return _upload; }
 	bool download() const { return _download; }
 	std::vector<std::string> get_files_content() { return files; }
+	std::vector<std::string> get_skip_files() { return skip; }
 	std::string get_access_token() const { return access; }
 	std::string get_dir_path() const { return dir_path; }
 	std::string get_file_name() const { return file_name; }

@@ -19,7 +19,7 @@ enum tokens {
 };
 
 struct types {
-	static const int size_of_array = 6;
+	static const int size_of_array = 7;
 	static const std::string s_types[size_of_array];
 
 	static bool check_type(const std::string s) {

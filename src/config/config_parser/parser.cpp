@@ -99,6 +99,15 @@ void parser::parse_config() {
 					b++;
 				}
 			}
+			else if (lexer_data[a].value == "SKIP_FILES") {
+				b = a + 2;
+				while (lexer_data[b].value != "}" && b < (int)lexer_data.size()) {
+					if (lexer_data[b].type == tokens::string_literal) {
+						skip.push_back(lexer_data[b].value);
+					}
+					b++;
+				}
+			}
 		} /**/
 	}
 

@@ -17,7 +17,7 @@ void zip_handler::open_zip(std::filesystem::path path) {
 		error_handler::call_error_and_exit(zip_strerror(z));
 }
 
-void zip_handler::unzip(std::filesystem::path output) {
+void zip_handler::unzip(std::filesystem::path output, std::vector<std::string> to_skip) {
 	char buff[100];
 	struct zip_stat st;
 	zip_file* f;
@@ -35,6 +35,16 @@ void zip_handler::unzip(std::filesystem::path output) {
 				std::filesystem::create_directory(file_name);
 				continue;
 			}
+			bool skip = false;
+			for (int a = 0; a < to_skip.size(); a++) {
+				if (to_skip[a] == std::filesystem::path(file_name).filename().string()) {
+					skip = true;
+					break;
+				}
+			}
+
+			if (skip)
+				continue;
 
 			std::fstream file(file_name, std::fstream::binary | std::fstream::out);
 

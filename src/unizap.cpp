@@ -14,8 +14,8 @@
 struct file_data {
 	std::string name;
 	std::string full_path;
-
-	file_data(std::string _name, std::string _full_path) : name(_name), full_path(_full_path){}
+	bool skipped;
+	file_data(std::string _name, std::string _full_path, bool _skipped = false) : name(_name), full_path(_full_path), skipped(_skipped){}
 };
 
 std::vector<std::string> files;
@@ -37,6 +37,14 @@ void zip_prepare(std::string zip_name) {
 	printf("Creating zip file...");
 	zip.create_zip(zip_name);
 	printf("Done\n");
+}
+
+bool is_skipped(std::filesystem::path path) {
+	for (int a = 0; a < _parser.get_skip_files().size(); a++) {
+		if (path.string().find(_parser.get_skip_files()[a]) != std::string::npos)
+			return true;
+	}
+	return false;
 }
 
 /*
@@ -86,7 +94,7 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 		std::string _d = _p[a].string();
 		std::string buffer = _d;
 		_d.erase(0, base_path.length() + 1);
-		all_files.push_back(file_data(_d, buffer));
+		all_files.push_back(file_data(_d, buffer, is_skipped(_d)));
 		if (std::filesystem::is_directory(buffer)) {
 			//_d.erase(0, base_path.length() + 1);
 			__p.one_forward();
@@ -103,6 +111,8 @@ void zip_up_directory(std::string path, std::string zip_name, bool include_dir, 
 		__p.one_forward();
 		std::string _d = _p[a].string();
 		std::string buff = _d;
+		if (is_skipped(_d))
+			continue;
 		_d.erase(0, base_path.length() + 1);
 #ifdef __linux__
 		_d.erase(_d.rfind("/"), _d.length());
@@ -155,7 +165,7 @@ void upload() {
 		printf("\\===FILES====/\n");
 		for (int a = 0; a < (int)all_files.size(); a++) {
 			format_file_size f(all_files[a].full_path);
-			printf("path: %s, size: %s\n", all_files[a].name.c_str(), f.formatted_size().c_str());
+			printf("path: %s, size: %s, skipped: %s\n", all_files[a].name.c_str(), f.formatted_size().c_str(), all_files[a].skipped ? "true" : "false");
 		}
 		printf("\\===FILES====/\n");
 
@@ -226,7 +236,7 @@ int main() {
 			printf("}\n");
 			zip.open_zip(s);
 			printf("unzipping...");
-			zip.unzip(std::filesystem::absolute(_parser.get_output_path()).string());
+			zip.unzip(std::filesystem::absolute(_parser.get_output_path()).string(), _parser.get_skip_files());
 			std::filesystem::remove(std::filesystem::absolute(_parser.get_output_path()).string() + "/" + _parser.get_file_name());
 			printf("Done\n");
 
