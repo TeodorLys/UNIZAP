@@ -26,7 +26,10 @@ void zip_handler::unzip(std::filesystem::path output) {
 			f = zip_fopen_index(z, a, 0);
 			std::string file_name = output.string() + "/";
 			file_name += st.name;
-			file_name.replace(file_name.begin(), file_name.end(), '\\', '/');
+			for (int a = 0; a < file_name.size(); a++) {
+				if (file_name[a] == '\\')
+					file_name[a] = '/';
+			}
 			printf("unzipping: %s\n", file_name.c_str());
 			if (file_name[file_name.size() - 1] == '/') {
 				std::filesystem::create_directory(file_name);
