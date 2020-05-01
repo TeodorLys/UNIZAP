@@ -30,7 +30,6 @@ void zip_handler::unzip(std::filesystem::path output, std::vector<std::string> t
 				if (file_name[a] == '\\')
 					file_name[a] = '/';
 			}
-			printf("unzipping: %s\n", file_name.c_str());
 			if (file_name[file_name.size() - 1] == '/') {
 				std::filesystem::create_directory(file_name);
 				continue;
@@ -43,6 +42,7 @@ void zip_handler::unzip(std::filesystem::path output, std::vector<std::string> t
 				}
 			}
 
+			printf("unzipping: %s, skipped: %s\n", file_name.c_str(), skip ? "true" : "false");
 			if (skip)
 				continue;
 
