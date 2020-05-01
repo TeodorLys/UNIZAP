@@ -227,7 +227,7 @@ int main() {
 			zip.open_zip(s);
 			printf("unzipping...");
 			zip.unzip(std::filesystem::absolute(_parser.get_output_path()).string());
-			std::filesystem::remove(std::filesystem::absolute(_parser.get_output_path()).string());
+			std::filesystem::remove(std::filesystem::absolute(_parser.get_output_path()).string() + "/" + _parser.get_file_name());
 			printf("Done\n");
 
 		}
