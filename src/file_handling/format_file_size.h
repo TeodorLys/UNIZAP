@@ -22,7 +22,7 @@ public:
 	};
 
 	format_file_size(std::filesystem::path path) {
-		if (!std::filesystem::exists(path) && std::filesystem::is_directory(path))
+		if (!std::filesystem::exists(path) || std::filesystem::is_directory(path))
 			return;
 			//error_handler::call_error_and_exit("[FORMAT_FILE_SIZE] Path does not exists...");
 		file_size = std::filesystem::file_size(path);
